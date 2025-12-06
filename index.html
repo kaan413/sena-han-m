@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kaan'la Çıkarmısın?</title>
+  <style>
+    :root{--bg:#000;--fg:#fff}
+    html,body{text-align:center; height:100%;margin:0}
+    body{
+      background:var(--bg);
+      color:var(--fg);
+      font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .card{
+      text-align:center;
+      padding:28px 36px;
+      border-radius:12px;
+      backdrop-filter: blur(6px);
+    }
+    h1{margin:0 0 18px;font-size:38px;letter-spacing:0.4px}
+
+    .buttons{display:flex;gap:18px;justify-content:center}
+    button{
+      font-size:18px;padding:12px 22px;border-radius:10px;border:2px solid rgba(255,255,255,0.12);
+      background:rgba(255,255,255,0.03);color:var(--fg);cursor:pointer;transition:transform .12s,opacity .12s;
+    }
+    button:active{transform:translateY(2px)}
+
+    .heart-wrap{display:none;align-items:center;justify-content:center;flex-direction:column;font-size:120px;}
+
+    .hidden{display:none !important}
+
+    /* Falling roses */
+    .rose{position:fixed;top:-50px;left:0;font-size:28px;animation:fall 4s linear infinite;}
+    @keyframes fall{
+      0%{transform:translateY(-50px) rotate(0deg);opacity:1}
+      100%{transform:translateY(110vh) rotate(360deg);opacity:0}
+    }
+
+    /* Confetti */
+    .confetti{
+      position:fixed;
+      font-size:26px;
+      pointer-events:none;
+      opacity:0;
+      transition:transform 900ms linear,opacity 900ms linear;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card" id="card">
+    <h1>kaanla çıkarmısın</h1>
+    <div class="buttons" id="btns">
+      <button id="evet">Evet</button>
+      <button id="hayir">Hayır</button>
+    </div>
+    <div class="hint" id="hint">
+      Seçimini yap — evete basınca sürpriz var. hayıra bastıkça büyüyecek; sonra kaybolacak.
+    </div>
+  </div>
+
+  <div class="heart-wrap" id="heartWrap">💖</div>
+
+  <script>
+    const evetBtn = document.getElementById('evet');
+    const hayirBtn = document.getElementById('hayir');
+    const card = document.getElementById('card');
+    const heartWrap = document.getElementById('heartWrap');
+
+    let hayirCount = 0;
+    const HAYIR_THRESHOLD = 6;
+
+    /* ✔✔✔ Konfeti fonksiyonu – EKLENDİ */
+    function spawnConfetti(count = 35){
+      for(let i=0;i<count;i++){
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.textContent = '🎉';
+
+        const x = window.innerWidth/2;
+        const y = window.innerHeight/2;
+        c.style.left = x + 'px';
+        c.style.top  = y + 'px';
+
+        const dx = (Math.random()-0.5)*800;
+        const dy = (Math.random()-0.8)*900;
+
+        document.body.appendChild(c);
+
+        requestAnimationFrame(()=>{
+          c.style.opacity = 1;
+          c.style.transform = translate(${dx}px, ${dy}px) rotate(${Math.random()*720}deg);
+        });
+
+        setTimeout(()=>c.remove(),1000);
+      }
+    }
+
+    /* ✔ EVET TIKLANINCA: konfeti + kalp */
+    evetBtn.addEventListener('click', () => {
+      spawnConfetti(); // 🎉 BURADA PATLIYOR
+
+      card.classList.add('hidden');
+      heartWrap.style.display = 'flex';
+    });
+
+    hayirBtn.addEventListener('click', () => {
+      hayirCount++;
+      const scale = 1 + 0.15 * hayirCount;
+      hayirBtn.style.transform = scale(${scale});
+      hayirBtn.style.transition = 'transform .14s ease-out';
+
+      if(hayirCount >= HAYIR_THRESHOLD){
+        hayirBtn.classList.add('hidden');
+        document.getElementById('hint').textContent = 'Hayır kayboldu — artık sadece Evet var.';
+      }
+    });
+
+    // Gül yağmuru
+    function createRose(){
+      const rose=document.createElement('div');
+      rose.classList.add('rose');
+      rose.textContent='🌹';
+      rose.style.left=Math.random()*100+'vw';
+      rose.style.animationDuration=(3+Math.random()*2)+'s';
+      document.body.appendChild(rose);
+      setTimeout(()=>rose.remove(),5000);
+    }
+    setInterval(createRose,400);
+  </script>
+
+</body>
+</html>
